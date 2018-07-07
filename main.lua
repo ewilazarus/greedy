@@ -4,9 +4,7 @@ function love.load()
 
     function reset()
         availablePositions = {}
-        players = {
-            {x = 1, y = 1}
-        }
+        players = {}
         crumbs = {}
         directionQueue = {'right'}
         timer = 0
@@ -41,6 +39,14 @@ function love.load()
     end
 
     computeAvailablePositions()
+
+    function spawnPlayers()
+        local randomIndex = love.math.random(1, #availablePositions)
+        table.insert(players, availablePositions[randomIndex])
+        table.remove(availablePositions, randomIndex)
+    end
+
+    spawnPlayers()
 
     function spawnCrumbs()
         while #crumbs <= 50 do
