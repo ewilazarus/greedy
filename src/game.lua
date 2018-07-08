@@ -3,6 +3,7 @@ local utils = require('utils')
 
 local Player = { type = 'player' }
 local Crumb = { type = 'crumb' }
+local Grid = {}
 
 -------------------------------------------------------------------------------
 --------------------------------- DIMENSIONS ----------------------------------
@@ -24,6 +25,7 @@ local State = {
     players = {},
     crumbs = {},
     crumb_count = 0,
+    ready = false
 }
 
 function State:serialize()
@@ -54,24 +56,39 @@ function State:deserialize(s)
     self.t = tonumber(ss[1])
 
     -- Deserializes players
-    for _, splayer in utils.str_split(ss[2], ';') do
+    for _, splayer in ipairs(utils.str_split(ss[2], ';')) do
         local player = Player:deserialize(splayer)
         self.players[player.id] = player
     end
 
     -- Deserializes crumbs
-    for _, scrub in utils.str_split(ss[3], ';') do
+    for _, scrumb in ipairs(utils.str_split(ss[3], ';')) do
         local crumb = Crumb:deserialize(scrumb)
         self.crumbs[crumb.id] = crumb
         self.crumb_count = self.crumb_count + 1
     end
 end
 
+-- Deserializes and loads given game state
+function State:load(state)
+    State:deserialize(state)
+
+    -- Adds deserialized players to grid
+    for _, player in pairs(State.players) do
+        Grid[player.coordinates.x][player.coordinates.y] = player
+    end
+
+    -- Adds deserialized crumbs to grid
+    for _, crumb in pairs(State.crumbs) do
+        Grid[crumb.coordinates.x][crumb.coordinates.y] = crumb
+    end
+    State.ready = true
+end
+
 
 ----------------------------------- Grid --------------------------------------
 -- Represents the grid in a matrix-like fashion
 
-local Grid = {}
 for i = 1, x_axis_length do
     Grid[i] = {}
     for j = 1, y_axis_length do
@@ -208,7 +225,7 @@ function Player:move(key)
     if next_y > y_axis_length then next_y = 1
     elseif next_y < 1 then next_y = y_axis_length end
 
-    Grid:update_player(player, next_x, next_y)
+    Grid:update_player(self, next_x, next_y)
 end
 
 function Player:serialize()
@@ -249,21 +266,7 @@ return {
         for i = 1, 50 do
             Crumb:new()
         end
-    end,
-
-    -- Deserializes and loads given game state
-    load = function(state)
-        State:deserialize(state)
-
-        -- Adds deserialized players to grid
-        for _, player in ipairs(State.players) do
-            Grid[player.coordinates.x][player.coordinates.y] = player
-        end
-
-        -- Adds deserialized crumbs to grid
-        for _, crumb in ipairs(State.crumbs) do
-            Grid[crumb.coordinates.x][crumb.coordinates.y] = crumb
-        end
+        State.ready = true
     end,
 
     -- Tests if there are still available crumbs
@@ -285,8 +288,29 @@ return {
         return State:serialize()
     end,
 
+    ready = function()
+        return State.ready
+    end,
+
     callback = function(topic, message)
-        print(topic .. ": " .. message)
+        -- print(topic .. ": " .. message)
+
+        if topic == 'state' and not State.ready then
+            State:load(message)
+        elseif topic == 'players' then
+            local player = Player:deserialize(message)
+            if State.players[player.id] == nil then
+                State.players[player.id] = player
+                Grid[player.coordinates.x][player.coordinates.y] = player
+            end
+            mqtt_client:publish('state', State:serialize())
+        elseif topic == 'movements' then
+            local message_segments = utils.str_split(message, ':')
+            local player = State.players[message_segments[1]]
+            if player ~= nil then
+                player:move(message_segments[2])
+            end
+        end
     end
 }
 
