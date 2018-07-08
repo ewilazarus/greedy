@@ -1,17 +1,12 @@
-
--- package.path = "./vendor/?.lua;" .. package.path
--- socket = require("socket")
--- local mqtt = require("mqtt_library")
-
--- function mqttcb(topic, message)
---     print(topic .. ": " .. message)
--- end
-
--- mqtt_client = mqtt.client.create("localhost", 1883, mqttcb)
--- mqtt_client:connect("cliente love")
--- mqtt_client:subscribe({"test1"})
-
+socket = require("socket")
+local mqtt = require("mqtt_library")
 local models = require('models')
+
+function mqttcb(topic, message)
+    print(topic .. ": " .. message)
+end
+
+mqtt_client = mqtt.client.create("localhost", 1883, mqttcb)
 
 
 function love.load()
@@ -19,6 +14,9 @@ function love.load()
     grid:add_crumbs(50)
 
     player = models.create_player()
+    mqtt_client:connect("client#" .. player.id)
+    mqtt_client:subscribe({"test1"})
+
     grid:add_player(player)
 end
 

@@ -1,9 +1,8 @@
 local utils = require('utils')
 
-local x_axis_length = 10
-local y_axis_length = 10
--- local x_axis_length = 55
--- local y_axis_length = 40
+
+local x_axis_length = 55
+local y_axis_length = 40
 local cell_size = 15
 
 
