@@ -2,12 +2,22 @@
 
 A distributed game, written in Lua.
 
-(work in progress)
+This game was desinged as part of the distributed systems class at Puc-Rio.
 
-https://simplegametutorials.github.io/snake/
 
-mqtt_library.lua #519 -> table.getn virou #
-mqtt_library.lua #625 -> table.getn virou #
+# Pre-requisites
 
-env var MOSQUITTO_HOST
-env var MOSQUITTO_PORT
+To run this game you must have Lua 5.3+ installed, the luasocket findable on your LUA_PATH and acess to a Mosquitto server.
+
+
+# Instructions
+
+* clone the project `git clone https://github.com/ewilazarus/greedy.git`
+* `cd` into `greedy`
+* `./run.sh`
+
+Then you control your square by using the arrow keys.
+
+Optionally, you can also provide the host and port for the Mosquitto server by running
+
+* `MOSQUITTO_HOST=<hostname> MOSQUITTO_PORT=<port> ./run.sh`
