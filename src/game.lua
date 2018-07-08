@@ -42,7 +42,7 @@ function State:serialize()
     for _, crumb in ipairs(self.crumbs) do
         table.insert(scrumbs, crumb:serialize())
     end
-    table.insert(scrumbs, utils.str_concat(scrumbs, ';'))
+    table.insert(s, utils.str_concat(scrumbs, ';'))
 
     return utils.str_concat(s, '|')
 end
@@ -281,6 +281,10 @@ return {
     -- Returns a new player
     new_player = function()
         return Player:new()
+    end,
+
+    state = function()
+        return State:serialize()
     end
 }
 
