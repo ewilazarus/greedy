@@ -18,29 +18,39 @@ end
 
 
 -- Crumb model
-local Crumb = {
-    type = 'crumb'
-}
+local function create_crumb()
+    local Crumb = {
+        type = 'crumb',
+        id = utils.uuid(),
+        coordinates = {
+            x = nil,
+            y = nil
+        }
+    }
 
-function Crumb:draw(x, y)
-    love.graphics.setColor(1, .3, .3)
-    love.graphics.circle(
-        'fill',
-        (x - 0.5) * cell_size,
-        (y - 0.5) * cell_size,
-        cell_size/2
-    )
+    function Crumb:draw(x, y)
+        love.graphics.setColor(1, .3, .3)
+        love.graphics.circle(
+            'fill',
+            (x - 0.5) * cell_size,
+            (y - 0.5) * cell_size,
+            cell_size/2
+        )
+    end
+
+    return Crumb
 end
 
 
 -- Game state
 local GameState = {
     players = {},
-    crumbs = 0
+    crumbs = {},
+    crumb_count = 0
 }
 
 function GameState:is_game_over()
-    return self.crumbs == 0
+    return self.crumb_count == 0
 end
 
 
@@ -86,13 +96,15 @@ function Grid:add_player(player)
     self[spawnable_coordinates.x][spawnable_coordinates.y] = player
     player.coordinates.x = spawnable_coordinates.x
     player.coordinates.y = spawnable_coordinates.y
+    GameState.players[player.id] = player
 end
 
 function Grid:update_player(player, x, y)
     if self[x][y].type == 'player' then
         return
     elseif self[x][y].type == 'crumb' then
-        GameState.crumbs = GameState.crumbs - 1
+        GameState.crumbs[self[x][y].id] = nil
+        GameState.crumb_count = GameState.crumb_count - 1
     end
 
     self[player.coordinates.x][player.coordinates.y] = Empty
@@ -103,9 +115,13 @@ end
 
 function Grid:add_crumbs(amount)
     for i = 1, amount do
+        local crumb = create_crumb()
         local spawnable_coordinates = self:get_spawnable_coordinates()
-        self[spawnable_coordinates.x][spawnable_coordinates.y] = Crumb
-        GameState.crumbs = GameState.crumbs + 1
+        self[spawnable_coordinates.x][spawnable_coordinates.y] = crumb
+        crumb.coordinates.x = spawnable_coordinates.x
+        crumb.coordinates.y = spawnable_coordinates.y
+        GameState.crumbs[crumb.id] = crumb
+        GameState.crumb_count = GameState.crumb_count + 1
     end
 end
 
