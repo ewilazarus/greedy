@@ -11,10 +11,26 @@ local function uuid_composer(c)
     return string.format('%x', v)
 end
 
+local function get_random_color_segment()
+    return tonumber(string.format('%.2f', math.random()))
+end
+
 
 -- EXPOSED
 return {
     uuid = function()
         return string.gsub(uuid_template, '[xy]', uuid_composer)
+    end,
+
+    random_color = function()
+        return {
+            R = get_random_color_segment(),
+            G = get_random_color_segment(),
+            B = get_random_color_segment()
+        }
+    end,
+
+    random_index = function(upper_bound)
+        return math.random(1, upper_bound)
     end
 }
