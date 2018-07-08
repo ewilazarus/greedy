@@ -1,22 +1,20 @@
 socket = require("socket")
 local mqtt = require("mqtt_library")
 local models = require('models')
+local callback = require('callback')
 
-function mqttcb(topic, message)
-    print(topic .. ": " .. message)
-end
-
-mqtt_client = mqtt.client.create("localhost", 1883, mqttcb)
-
+local mqtt_client = mqtt.client.create(
+    os.getenv("MOSQUITTO_HOST"),
+    os.getenv("MOSQUITTO_PORT"),
+    callback)
 
 function love.load()
-    grid = models.grid
-    grid:add_crumbs(50)
-
     player = models.create_player()
     mqtt_client:connect("client#" .. player.id)
     mqtt_client:subscribe({"test1"})
 
+    grid = models.grid
+    grid:add_crumbs(50)
     grid:add_player(player)
 end
 

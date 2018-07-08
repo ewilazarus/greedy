@@ -8,3 +8,6 @@ https://simplegametutorials.github.io/snake/
 
 mqtt_library.lua #519 -> table.getn virou #
 mqtt_library.lua #625 -> table.getn virou #
+
+env var MOSQUITTO_HOST
+env var MOSQUITTO_PORT
