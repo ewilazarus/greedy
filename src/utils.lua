@@ -16,6 +16,18 @@ local function get_random_color_segment()
     return tonumber(string.format('%.2f', math.random()))
 end
 
+-- Copy table
+local function copy(src, dest)
+    for k, v in pairs(src) do
+        if type(v) == 'table' then
+            dest[k] = copy(v, {})
+        else
+            dest[k] = v
+        end
+    end
+    return setmetatable(dest, getmetatable(src))
+end
+
 
 -- EXPOSED
 return {
@@ -45,5 +57,7 @@ return {
             table.insert(rv, match)
         end
         return rv
-    end
+    end,
+
+    copy = copy
 }
