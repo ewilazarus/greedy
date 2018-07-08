@@ -32,14 +32,14 @@ function State:serialize()
 
     -- Serializes players
     local splayers = {}
-    for _, player in ipairs(self.players) do
+    for _, player in pairs(self.players) do
         table.insert(splayers, player:serialize())
     end
     table.insert(s, utils.str_concat(splayers, ';'))
 
     -- Serializes crumbs
     local scrumbs = {}
-    for _, crumb in ipairs(self.crumbs) do
+    for _, crumb in pairs(self.crumbs) do
         table.insert(scrumbs, crumb:serialize())
     end
     table.insert(s, utils.str_concat(scrumbs, ';'))
@@ -257,13 +257,11 @@ return {
 
         -- Adds deserialized players to grid
         for _, player in ipairs(State.players) do
-            print('player')
             Grid[player.coordinates.x][player.coordinates.y] = player
         end
 
         -- Adds deserialized crumbs to grid
         for _, crumb in ipairs(State.crumbs) do
-            print('crumb')
             Grid[crumb.coordinates.x][crumb.coordinates.y] = crumb
         end
     end,
@@ -285,6 +283,10 @@ return {
 
     state = function()
         return State:serialize()
+    end,
+
+    callback = function(topic, message)
+        print(topic .. ": " .. message)
     end
 }
 
