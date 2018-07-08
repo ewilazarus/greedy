@@ -1,3 +1,17 @@
+
+package.path = "./vendor/?.lua;" .. package.path
+socket = require("socket")
+local mqtt = require("mqtt_library")
+
+function mqttcb(topic, message)   
+    print(topic .. ": " .. message)
+end
+
+mqtt_client = mqtt.client.create("localhost", 1883, mqttcb)
+mqtt_client:connect("cliente love")  
+mqtt_client:subscribe({"test1"})  
+
+
 function love.load()
     gridXCount = 54
     gridYCount = 40
@@ -60,6 +74,8 @@ function love.load()
 end
 
 function love.update(dt)
+    mqtt_client:handler()
+
     timer = timer + dt
 
     local timerLimit = 0.15
