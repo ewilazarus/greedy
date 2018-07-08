@@ -11,6 +11,7 @@ local function uuid_composer(c)
     return string.format('%x', v)
 end
 
+-- Color segment generator
 local function get_random_color_segment()
     return tonumber(string.format('%.2f', math.random()))
 end
@@ -32,5 +33,17 @@ return {
 
     random_index = function(upper_bound)
         return math.random(1, upper_bound)
+    end,
+
+    str_concat = function(ss, separator)
+        return table.concat(ss, separator)
+    end,
+
+    str_split = function(s, separator)
+        rv = {};
+        for match in (s .. separator):gmatch("(.-)" .. separator) do
+            table.insert(rv, match)
+        end
+        return rv
     end
 }
